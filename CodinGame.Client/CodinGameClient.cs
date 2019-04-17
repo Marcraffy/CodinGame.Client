@@ -25,10 +25,8 @@ namespace CodinGame
             client.DefaultRequestHeaders.Add("API-Key", this.key);
         }
 
-        public async Task<List<Campaign>> GetCampaignsAsync()
-        {
-            return JsonConvert.DeserializeObject<List<Campaign>>(await GetAsync("campaigns"));
-        }
+        public async Task<List<Campaign>> GetCampaignsAsync() =>
+            JsonConvert.DeserializeObject<List<Campaign>>(await GetAsync("campaigns"));
 
         public async Task<TestSent> SendTestAsync(SendTest input)
         {
@@ -36,10 +34,8 @@ namespace CodinGame
             return JsonConvert.DeserializeObject<TestSent>(await PostAsync($"campaigns/{input.Id}/actions/send", requestBody));
         }
 
-        public async Task<TestStatus> GetStatusAsync(int id)
-        {
-            return JsonConvert.DeserializeObject<TestStatus>(await GetAsync($"tests/{id}"));
-        }
+        public async Task<TestStatus> GetStatusAsync(int id) =>
+            JsonConvert.DeserializeObject<TestStatus>(await GetAsync($"tests/{id}"));
 
         public async Task CancelTestAsync(int id)
         {
@@ -51,34 +47,19 @@ namespace CodinGame
             await PostAsync($"tests/{id}/actions/resend");
         }
 
-        private async Task<string> GetAsync(string uri)
+        private async Task<string> GetAsync(string uri) =>
+            await GetContentAsync(await client.GetAsync(uri));
+
+        private async Task<string> PostAsync(string uri, StringContent requestBody = null) =>
+            await GetContentAsync(await client.PostAsync(uri, requestBody ?? new StringContent(String.Empty)));
+
+        private async Task<string> GetContentAsync(HttpResponseMessage response)
         {
-            var response = await client.GetAsync(uri);
             var content = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                var error = JsonConvert.DeserializeObject<Error>(content);
-                throw new CodinGameException(error);
-            }
-
-            return content;
-        }
-
-        private async Task<string> PostAsync(string uri, StringContent requestBody = null)
-        {
-            if (requestBody == null)
-            {
-                requestBody = new StringContent(String.Empty);
-            }
-
-            var response = await client.PostAsync(uri, requestBody);
-            var content = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = JsonConvert.DeserializeObject<Error>(content);
-                throw new CodinGameException(error);
+                throw new CodinGameException(JsonConvert.DeserializeObject<Error>(content));
             }
 
             return content;
