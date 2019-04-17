@@ -25,38 +25,63 @@ namespace CodinGame
             client.DefaultRequestHeaders.Add("API-Key", this.key);
         }
 
-        public async Task<List<Campaign>> GetCampaigns()
+        public async Task<List<Campaign>> GetCampaignsAsync()
         {
-            var response = await client.GetAsync("campaigns");
+            return JsonConvert.DeserializeObject<List<Campaign>>(await GetAsync("campaigns"));
+        }
+
+        public async Task<TestSent> SendTestAsync(SendTest input)
+        {
+            var requestBody = new StringContent(JsonConvert.SerializeObject(input));
+            return JsonConvert.DeserializeObject<TestSent>(await PostAsync($"campaigns/{input.Id}/actions/send", requestBody));
+        }
+
+        public async Task<TestStatus> GetStatusAsync(int id)
+        {
+            return JsonConvert.DeserializeObject<TestStatus>(await GetAsync($"tests/{id}"));
+        }
+
+        public async Task CancelTestAsync(int id)
+        {
+            await PostAsync($"tests/{id}/actions/cancel");
+        }
+
+        public async Task ResendInvitationAsync(int id)
+        {
+            await PostAsync($"tests/{id}/actions/resend");
+        }
+
+        private async Task<string> GetAsync(string uri)
+        {
+            var response = await client.GetAsync(uri);
             var content = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
+
+            if (!response.IsSuccessStatusCode)
             {
-                var output = JsonConvert.DeserializeObject<List<Campaign>>(content);
-                return output;
+                var error = JsonConvert.DeserializeObject<Error>(content);
+                throw new CodinGameException(error);
             }
 
-            var error = JsonConvert.DeserializeObject<Error>(content);
-            throw new CodinGameException(error);
+            return content;
         }
 
-        public Task<TestSent> SendTest(SendTest input)
+        private async Task<string> PostAsync(string uri, StringContent requestBody = null)
         {
-            throw new NotImplementedException();
-        }
+            if (requestBody == null)
+            {
+                requestBody = new StringContent(String.Empty);
+            }
 
-        public Task<TestStatus> GetStatus(int id)
-        {
-            throw new NotImplementedException();
-        }
+            var response = await client.PostAsync(uri, requestBody);
+            var content = await response.Content.ReadAsStringAsync();
 
-        public Task CancelTest(int Id)
-        {
-            throw new NotImplementedException();
-        }
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = JsonConvert.DeserializeObject<Error>(content);
+                throw new CodinGameException(error);
+            }
 
-        public Task ResendInvitation(int Id)
-        {
-            throw new NotImplementedException();
+            return content;
         }
     }
 }
