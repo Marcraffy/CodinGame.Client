@@ -1,11 +1,11 @@
-﻿using CodinGame.Exceptions;
-using CodinGame.Data;
+﻿using CodinGame.Data;
+using CodinGame.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Net;
 
 namespace CodinGame
 {
@@ -32,10 +32,10 @@ namespace CodinGame
         public async Task<TestStatus> GetStatusAsync(int id) =>
             Deserialize<TestStatus>(await GetAsync($"tests/{id}"));
 
-        public async Task<TestSent> SendTestAsync(SendTest input)
+        public async Task<TestSent> SendTestAsync(int id, SendTest input)
         {
             var requestBody = new StringContent(JsonConvert.SerializeObject(input));
-            return Deserialize<TestSent>(await PostAsync($"campaigns/{input.Id}/actions/send", requestBody));
+            return Deserialize<TestSent>(await PostAsync($"campaigns/{id}/actions/send", requestBody));
         }
 
         public async Task CancelTestAsync(int id)
