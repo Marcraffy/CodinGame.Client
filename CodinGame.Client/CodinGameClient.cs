@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace CodinGame
 {
@@ -26,16 +27,16 @@ namespace CodinGame
         }
 
         public async Task<List<Campaign>> GetCampaignsAsync() =>
-            JsonConvert.DeserializeObject<List<Campaign>>(await GetAsync("campaigns"));
+            Deserialize<List<Campaign>>(await GetAsync("campaigns"));
+
+        public async Task<TestStatus> GetStatusAsync(int id) =>
+            Deserialize<TestStatus>(await GetAsync($"tests/{id}"));
 
         public async Task<TestSent> SendTestAsync(SendTest input)
         {
             var requestBody = new StringContent(JsonConvert.SerializeObject(input));
-            return JsonConvert.DeserializeObject<TestSent>(await PostAsync($"campaigns/{input.Id}/actions/send", requestBody));
+            return Deserialize<TestSent>(await PostAsync($"campaigns/{input.Id}/actions/send", requestBody));
         }
-
-        public async Task<TestStatus> GetStatusAsync(int id) =>
-            JsonConvert.DeserializeObject<TestStatus>(await GetAsync($"tests/{id}"));
 
         public async Task CancelTestAsync(int id)
         {
@@ -53,16 +54,35 @@ namespace CodinGame
         private async Task<string> PostAsync(string uri, StringContent requestBody = null) =>
             await GetContentAsync(await client.PostAsync(uri, requestBody ?? new StringContent(String.Empty)));
 
-        private async Task<string> GetContentAsync(HttpResponseMessage response)
+        private static async Task<string> GetContentAsync(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                throw new CodinGameException(JsonConvert.DeserializeObject<Error>(content));
+                return content;
             }
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                throw new CodinGameException(Deserialize<Error>(content));
+            }
+            else if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                throw new CodinGameException("The API Key is invalid or expired");
+            }
+            else
+            {
+                throw new CodinGameException("An unexpected error occurred");
+            }
+        }
 
-            return content;
+        private static T Deserialize<T>(string message)
+        {
+            var output = JsonConvert.DeserializeObject<T>(message);
+            if ((object)output == null)
+            {
+                throw new CodinGameException("An error occurred while deserializing the response body");
+            }
+            return output;
         }
     }
 }
