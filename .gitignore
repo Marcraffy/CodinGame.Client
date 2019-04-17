@@ -4,3 +4,4 @@
 
 /.vs
 /CodinGame.Client/obj
+/CodinGame.Client/bin/Debug/netstandard2.0

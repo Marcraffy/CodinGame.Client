@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Abp.AppFactory.CodinGame.Client.CodinGame
+namespace CodinGame.Data
 {
     public class TestSent
     {

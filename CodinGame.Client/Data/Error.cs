@@ -1,4 +1,4 @@
-﻿namespace Abp.AppFactory.CodinGame.Client.CodinGame
+﻿namespace CodinGame.Data
 {
     public class Error
     {

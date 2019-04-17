@@ -1,34 +1,42 @@
-﻿using Abp.AppFactory.CodinGame.Client.CodinGame;
+﻿using CodinGame.Exceptions;
+using CodinGame.Data;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Abp.AppFactory.CodinGame.Client
+namespace CodinGame
 {
-    public class CodinGameClient
+    public class Client
     {
-        private readonly string token;
+        private readonly string key;
         private readonly HttpClient client;
 
         private const string ApiURL = "https://www.codingame.com/assessment/api/v1.1/";
 
-        public CodinGameClient(string token)
+        public Client(string key)
         {
-            this.token = "token";
-            client = new HttpClient();
-            client.BaseAddress = new Uri(ApiURL);
-            client.DefaultRequestHeaders.Add("API-Key", this.token);
+            this.key = key;
+            client = new HttpClient
+            {
+                BaseAddress = new Uri(ApiURL)
+            };
+            client.DefaultRequestHeaders.Add("API-Key", this.key);
         }
 
         public async Task<List<Campaign>> GetCampaigns()
         {
             var response = await client.GetAsync("campaigns");
+            var content = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
-                var output = Newtonsoft.Json.JsonConvert.DeserializeObject<Campaign[]>(await response.Content.ReadAsStringAsync());
+                var output = JsonConvert.DeserializeObject<List<Campaign>>(content);
+                return output;
             }
-            throw new NotImplementedException();
+
+            var error = JsonConvert.DeserializeObject<Error>(content);
+            throw new CodinGameException(error);
         }
 
         public Task<TestSent> SendTest(SendTest input)
