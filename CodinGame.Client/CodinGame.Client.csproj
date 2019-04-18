@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>CodinGame</RootNamespace>
+    <Version>1.1.0</Version>
+    <Authors>Marc Raftesath</Authors>
+    <Company>Marc Raftesath</Company>
+    <Product>CodinGame Client</Product>
+    <PackageId>CodinGame.Client</PackageId>
+    <RepositoryUrl>https://github.com/Marcraffy/CodinGame.Client</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/Marcraffy/CodinGame.Client</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/Marcraffy/CodinGame.Client</PackageLicenseUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

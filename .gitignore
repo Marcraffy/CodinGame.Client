@@ -5,3 +5,7 @@
 /.vs
 /CodinGame.Client/obj
 /CodinGame.Client/bin/Debug/netstandard2.0
+/CodinGame.Client/bin/Release
+/CodinGame.Client/bin/Debug
+/CodinGame.Client/Properties/PublishProfiles
+/CodinGame.Client/CodinGame.Client.csproj.user
