@@ -1,8 +1,13 @@
-﻿namespace CodinGame.Data
+﻿using Newtonsoft.Json;
+
+namespace CodinGame.Data
 {
     public class TestSent
     {
+        [JsonProperty("id")]
         public int Id { get; set; }
-        public string Test_URL { get; set; }
+
+        [JsonProperty("test_url")]
+        public string URL { get; set; }
     }
 }

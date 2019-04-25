@@ -1,11 +1,22 @@
-﻿namespace CodinGame.Data
+﻿using Newtonsoft.Json;
+
+namespace CodinGame.Data
 {
     public class SendTest
     {
-        public string Candidate_Email { get; set; }
-        public string Candidate_Name { get; set; }
-        public string Recruiter_Email { get; set; }
+        [JsonProperty("candidate_email")]
+        public string CandidateEmail { get; set; }
+
+        [JsonProperty("candidate_name")]
+        public string CandidateName { get; set; }
+
+        [JsonProperty("recruiter_email")]
+        public string RecruiterEmail { get; set; }
+
+        [JsonProperty("tags")]
         public string Tags { get; set; }
-        public bool Send_Invitation_Email { get; set; }
+
+        [JsonProperty("send_invitation_email")]
+        public bool SendInvitationEmail { get; set; }
     }
 }

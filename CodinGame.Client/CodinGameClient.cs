@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CodinGame
@@ -24,6 +26,7 @@ namespace CodinGame
                 BaseAddress = new Uri(ApiURL)
             };
             client.DefaultRequestHeaders.Add("API-Key", this.key);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<List<Campaign>> GetCampaignsAsync() =>
@@ -34,7 +37,7 @@ namespace CodinGame
 
         public async Task<TestSent> SendTestAsync(int id, SendTest input)
         {
-            var requestBody = new StringContent(JsonConvert.SerializeObject(input));
+            var requestBody = new StringContent(JsonConvert.SerializeObject(input), Encoding.UTF8, "application/json");
             return Deserialize<TestSent>(await PostAsync($"campaigns/{id}/actions/send", requestBody));
         }
 
@@ -52,7 +55,7 @@ namespace CodinGame
             await GetContentAsync(await client.GetAsync(uri));
 
         private async Task<string> PostAsync(string uri, StringContent requestBody = null) =>
-            await GetContentAsync(await client.PostAsync(uri, requestBody ?? new StringContent(String.Empty)));
+            await GetContentAsync(await client.PostAsync(uri, requestBody ?? new StringContent(String.Empty, Encoding.UTF8, "application/json")));
 
         private static async Task<string> GetContentAsync(HttpResponseMessage response)
         {

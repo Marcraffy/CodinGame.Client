@@ -1,9 +1,16 @@
-﻿namespace CodinGame.Data
+﻿using Newtonsoft.Json;
+
+namespace CodinGame.Data
 {
     public class ReportSkill
     {
+        [JsonProperty("points")]
         public int Points { get; set; }
+
+        [JsonProperty("score")]
         public double Score { get; set; }
-        public int Total_Points { get; set; }
+
+        [JsonProperty("total_points")]
+        public int TotalPoints { get; set; }
     }
 }
